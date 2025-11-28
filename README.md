@@ -10,3 +10,8 @@ then we need to run ,
 
 and for update Super Admin password we have file reset admin 
 #npm run reset-admin
+
+Passwords:
+  Admins (all):    password = Admin@123
+  Staff  (all):    password = Staff@123
+  Students (all):  password = Student@123

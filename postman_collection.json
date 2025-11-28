@@ -1,0 +1,225 @@
+{
+  "info": {
+    "_postman_id": "7b2c9ab1-8a6f-4e59-9d11-123456789abc",
+    "name": "Education Scheduler – Full Flow (Seeded)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "gpt5"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "token_admin", "value": "" },
+    { "key": "token_staff", "value": "" },
+    { "key": "token_student", "value": "" },
+    { "key": "sampleScheduleId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Admin Login (admin1@example.com / Admin@123)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin1@example.com\",\n  \"password\": \"Admin@123\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token_admin', json.data.token);",
+                  "  console.log('Set token_admin');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Staff Login (staff1@example.com / Staff@123)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"staff1@example.com\",\n  \"password\": \"Staff@123\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token_staff', json.data.token);",
+                  "  console.log('Set token_staff');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Login (student1@example.com / Student@123)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"Student@123\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token_student', json.data.token);",
+                  "  console.log('Set token_student');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin Actions",
+      "item": [
+        {
+          "name": "Register Staff (admin-only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Staff G\",\n  \"email\": \"staff7@example.com\",\n  \"password\": \"Staff@123\",\n  \"role\": \"staff\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Student (admin-only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Student\",\n  \"email\": \"student11@example.com\",\n  \"password\": \"Student@123\",\n  \"role\": \"student\",\n  \"yearNo\": 1,\n  \"semesterNo\": 1,\n  \"batch\": \"A\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Users (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "url": { "raw": "{{baseUrl}}/users?page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["users"], "query": [ { "key": "page", "value": "1" }, { "key": "limit", "value": "20" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff – Schedules",
+      "item": [
+        {
+          "name": "Create Schedule (staff)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/schedules", "host": ["{{baseUrl}}"], "path": ["schedules"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Biology – Human Anatomy\",\n  \"description\": \"Basics of the human body\",\n  \"yearNo\": 1,\n  \"semesterNo\": 1,\n  \"batch\": \"A\",\n  \"startAt\": \"2025-12-05T09:00:00.000Z\",\n  \"endAt\": \"2025-12-05T10:00:00.000Z\",\n  \"attendees\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "List Schedules (staff/admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/schedules?yearNo=1&semesterNo=1&batch=A&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules"],
+              "query": [
+                { "key": "yearNo", "value": "1" },
+                { "key": "semesterNo", "value": "1" },
+                { "key": "batch", "value": "A" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Schedules (?s=algebra)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
+            "url": { "raw": "{{baseUrl}}/schedules?s=algebra", "host": ["{{baseUrl}}"], "path": ["schedules"], "query": [ { "key": "s", "value": "algebra" } ] }
+          }
+        },
+        {
+          "name": "Get Schedule By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
+            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] }
+          }
+        },
+        {
+          "name": "Patch Schedule (title)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Updated – Human Anatomy\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Schedule",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
+            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student – My Schedules",
+      "item": [
+        {
+          "name": "List My Schedules (student1)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_student}}" }],
+            "url": { "raw": "{{baseUrl}}/schedules", "host": ["{{baseUrl}}"], "path": ["schedules"] }
+          }
+        }
+      ]
+    }
+  ]
+}

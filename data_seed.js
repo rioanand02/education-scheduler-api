@@ -1,6 +1,6 @@
-// seed_schedules.js
-// Run: node seed_schedules.js
-// This version matches your real Schedule schema used in src/models/Schedule.js
+// seed.js
+// Run: node seed.js
+// Creates 3 admins, 6 staff, 10 students, and 12 schedules that match your API schema.
 
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -12,7 +12,7 @@ const MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb://127.0.0.1:27017/education?directConnection=true";
 
-// ---- SCHEMAS ----
+// ----- Minimal Schemas (aligned to app schema) -----
 const userSchema = new mongoose.Schema(
   {
     name: String,
@@ -30,9 +30,9 @@ const scheduleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: String,
-    yearNo: Number,
-    semesterNo: Number,
-    batch: String,
+    yearNo: { type: Number, required: true },
+    semesterNo: { type: Number, required: true },
+    batch: { type: String, required: true },
     startAt: { type: Date, required: true },
     endAt: { type: Date, required: true },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
@@ -44,171 +44,177 @@ const scheduleSchema = new mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 const Schedule = mongoose.model("Schedule", scheduleSchema);
 
-// ---- HELPERS ----
-const addHours = (date, hrs) => new Date(date.getTime() + hrs * 3600000);
-const salt = await bcrypt.genSalt(10);
-const hashed = await bcrypt.hash("Password@123", salt);
+// ----- Helpers -----
+const addHours = (d, h) => new Date(d.getTime() + h * 3600000);
 
-async function upsertUser({ name, email, role, yearNo, semesterNo, batch }) {
-  const existing = await User.findOne({ email });
-  if (existing) return existing;
-  return User.create({
-    name,
-    email,
-    password: hashed,
-    role,
-    yearNo,
-    semesterNo,
-    batch,
-  });
+// Simple cohort rotation for variety
+const cohorts = [
+  { yearNo: 1, semesterNo: 1, batch: "A" },
+  { yearNo: 1, semesterNo: 1, batch: "B" },
+  { yearNo: 2, semesterNo: 3, batch: "A" },
+  { yearNo: 2, semesterNo: 3, batch: "B" },
+  { yearNo: 3, semesterNo: 5, batch: "A" },
+  { yearNo: 3, semesterNo: 5, batch: "B" },
+];
+
+async function hash(pw) {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(pw, salt);
 }
 
-// ---- MAIN SEED ----
-async function main() {
-  console.log("Connecting to:", MONGO_URI);
-  await mongoose.connect(MONGO_URI);
-  console.log("✅ Connected");
+async function createUsers() {
+  // wipe
+  await User.deleteMany({});
 
-  const admin = await upsertUser({
-    name: "Admin One",
-    email: "admin@example.com",
-    role: "admin",
-  });
+  // Admins
+  const adminPw = await hash("Admin@123");
+  const admins = await User.insertMany([
+    { name: "Admin One",   email: "admin1@example.com", password: adminPw, role: "admin" },
+    { name: "Admin Two",   email: "admin2@example.com", password: adminPw, role: "admin" },
+    { name: "Admin Three", email: "admin3@example.com", password: adminPw, role: "admin" },
+  ]);
 
-  const staff = await upsertUser({
-    name: "Staff Jane",
-    email: "staff@example.com",
-    role: "staff",
-  });
+  // Staff
+  const staffPw = await hash("Staff@123");
+  const staffs = await User.insertMany([
+    { name: "Staff A", email: "staff1@example.com", password: staffPw, role: "staff" },
+    { name: "Staff B", email: "staff2@example.com", password: staffPw, role: "staff" },
+    { name: "Staff C", email: "staff3@example.com", password: staffPw, role: "staff" },
+    { name: "Staff D", email: "staff4@example.com", password: staffPw, role: "staff" },
+    { name: "Staff E", email: "staff5@example.com", password: staffPw, role: "staff" },
+    { name: "Staff F", email: "staff6@example.com", password: staffPw, role: "staff" },
+  ]);
 
-  const student1 = await upsertUser({
-    name: "Stu Alpha",
-    email: "stu1@example.com",
-    role: "student",
-    yearNo: 2,
-    semesterNo: 3,
-    batch: "A",
-  });
+  // Students (10) spread across cohorts
+  const studentPw = await hash("Student@123");
+  const studentsPayload = [];
+  const names = [
+    "Alice", "Bob", "Charlie", "Daisy", "Ethan",
+    "Fiona", "George", "Hannah", "Ivan", "Julia"
+  ];
+  for (let i = 0; i < 10; i++) {
+    const c = cohorts[i % cohorts.length];
+    studentsPayload.push({
+      name: `${names[i]} Student`,
+      email: `student${i + 1}@example.com`,
+      password: studentPw,
+      role: "student",
+      yearNo: c.yearNo,
+      semesterNo: c.semesterNo,
+      batch: c.batch,
+    });
+  }
+  const students = await User.insertMany(studentsPayload);
 
-  const student2 = await upsertUser({
-    name: "Stu Beta",
-    email: "stu2@example.com",
-    role: "student",
-    yearNo: 2,
-    semesterNo: 3,
-    batch: "A",
-  });
+  return { admins, staffs, students };
+}
 
-  console.log("Seeded users:", {
-    admin: admin._id.toString(),
-    staff: staff._id.toString(),
-    student1: student1._id.toString(),
-    student2: student2._id.toString(),
-  });
-
-  // Clean old schedules created by this staff/admin
-  await Schedule.deleteMany({ createdBy: { $in: [admin._id, staff._id] } });
-
+function buildSchedules(staffs, students) {
   const now = new Date();
-  const schedules = [
-    {
-      title: "Math – Algebra Intro",
-      description: "Quadratic equations basics",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 24),
-      endAt: addHours(now, 25),
-      attendees: [student1._id, student2._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "Science – Physics Lab",
-      description: "Newton’s laws experiment",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 28),
-      endAt: addHours(now, 30),
-      attendees: [student1._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "English – Essay Workshop",
-      description: "Structure and thesis",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 48),
-      endAt: addHours(now, 49),
-      attendees: [student2._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "Computer – JS Basics",
-      description: "Variables & loops",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 52),
-      endAt: addHours(now, 54),
-      attendees: [student1._id, student2._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "History – Ancient Rome",
-      description: "Republic to Empire",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, -24),
-      endAt: addHours(now, -23),
-      attendees: [student1._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "Chemistry – Safety Briefing",
-      description: "Lab safety rules",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 10),
-      endAt: addHours(now, 11),
-      attendees: [student2._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "Math – Algebra Chapter 2",
-      description: "Factoring",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 72),
-      endAt: addHours(now, 73),
-      attendees: [student1._id],
-      createdBy: staff._id,
-    },
-    {
-      title: "Sports – Football Practice",
-      description: "Drills and scrimmage",
-      yearNo: 2,
-      semesterNo: 3,
-      batch: "A",
-      startAt: addHours(now, 80),
-      endAt: addHours(now, 82),
-      attendees: [student1._id, student2._id],
-      createdBy: staff._id,
-    },
+  // choose some cohorts for the schedules
+  const schedCohorts = [
+    { yearNo: 1, semesterNo: 1, batch: "A" },
+    { yearNo: 1, semesterNo: 1, batch: "B" },
+    { yearNo: 2, semesterNo: 3, batch: "A" },
+    { yearNo: 2, semesterNo: 3, batch: "B" },
+    { yearNo: 3, semesterNo: 5, batch: "A" },
+    { yearNo: 3, semesterNo: 5, batch: "B" },
   ];
 
-  const result = await Schedule.insertMany(schedules);
-  console.log(`✅ Inserted ${result.length} schedules`);
+  const pickStaff = (i) => staffs[i % staffs.length]._id;
+  const pickStudentsForCohort = (yearNo, semesterNo, batch, limit = 3) => {
+    const filtered = students.filter(
+      (s) => s.yearNo === yearNo && s.semesterNo === semesterNo && s.batch === batch
+    );
+    return filtered.slice(0, limit).map((s) => s._id);
+  };
 
-  await mongoose.disconnect();
-  console.log("✅ Done!");
+  // 12 schedules at different offsets (some past, some future)
+  const titles = [
+    "Orientation & Welcome",
+    "Mathematics – Algebra Basics",
+    "Physics – Motion & Forces",
+    "Chemistry – Lab Safety",
+    "English – Essay Workshop",
+    "Computer – JavaScript Intro",
+    "History – Ancient Civilizations",
+    "Biology – Cell Structure",
+    "Economics – Supply & Demand",
+    "Art – Color Theory",
+    "Sports – Football Practice",
+    "CS – Data Structures Basics"
+  ];
+
+  const descs = [
+    "General overview and rules",
+    "Quadratics and factoring",
+    "Newton’s laws introduction",
+    "Safety briefing and PPE",
+    "Structure and thesis writing",
+    "Variables, loops, and arrays",
+    "From Mesopotamia to Rome",
+    "Cells, organelles and functions",
+    "Market basics and curves",
+    "Hue, saturation, value",
+    "Warm-ups and scrimmage",
+    "Arrays, stacks, and queues",
+  ];
+
+  // hour offsets to diversify dates (-72h..+240h)
+  const offsets = [-72, -24, -6, 6, 12, 24, 36, 48, 72, 120, 168, 240];
+
+  const payload = [];
+  for (let i = 0; i < 12; i++) {
+    const cohort = schedCohorts[i % schedCohorts.length];
+    const staffId = pickStaff(i);
+    const start = addHours(now, offsets[i]);
+    const end = addHours(now, offsets[i] + 2);
+    const att = pickStudentsForCohort(cohort.yearNo, cohort.semesterNo, cohort.batch, 4);
+
+    payload.push({
+      title: titles[i],
+      description: descs[i],
+      yearNo: cohort.yearNo,
+      semesterNo: cohort.semesterNo,
+      batch: cohort.batch,
+      startAt: start,
+      endAt: end,
+      attendees: att,
+      createdBy: staffId,
+    });
+  }
+
+  return payload;
 }
 
-main().catch((err) => {
+async function seed() {
+  console.log("Connecting to:", MONGO_URI);
+  await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 });
+  console.log("✅ MongoDB connected");
+
+  await Schedule.deleteMany({});
+  const { admins, staffs, students } = await createUsers();
+
+  const schedules = buildSchedules(staffs, students);
+  await Schedule.insertMany(schedules);
+
+  console.log("✅ Seeded:");
+  console.log(`  Admins:  ${admins.map((a) => a.email).join(", ")}`);
+  console.log(`  Staff:   ${staffs.map((s) => s.email).join(", ")}`);
+  console.log(`  Students:${students.map((s) => s.email).join(", ")}`);
+  console.log("  Schedules: 12");
+
+  console.log("\n🔑 Credentials:");
+  console.log("  Admins (all):    password = Admin@123");
+  console.log("  Staff  (all):    password = Staff@123");
+  console.log("  Students (all):  password = Student@123");
+
+  await mongoose.disconnect();
+  console.log("✅ Disconnected");
+}
+
+seed().catch((err) => {
   console.error("❌ Seed failed:", err);
   mongoose.disconnect();
+  process.exit(1);
 });
