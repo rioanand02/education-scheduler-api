@@ -1,2 +1,12 @@
-# education-scheduler-api
-Education Schedules &amp; Staff–Student API
+In Project Folder 
+
+we need to install all depandencies 
+
+#npm i -S
+
+then we need to run ,
+#npm run dev -- development
+#npm run start -- production
+
+and for update Super Admin password we have file reset admin 
+#npm run reset-admin
