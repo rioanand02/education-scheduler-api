@@ -1,85 +1,151 @@
-📘 Education Scheduler API (Express + MongoDB)
+📘 Education Scheduler API (Express + MongoDB + Atlas)
 
-In your project folder, follow these steps to set up and run the application 👇
+A role-based education management REST API built with Node.js (Express) and MongoDB Atlas, including authentication, schedules, and access control for Admins, Staff, and Students.
 
 ⚙️ Setup Instructions
 1️⃣ Install dependencies
+
+In your project folder:
+
 npm i -S
 
-2️⃣ Run the server
+2️⃣ Database (MongoDB Atlas)
+
+The application is configured to connect to MongoDB Atlas automatically.
+
+You don’t need to run MongoDB locally — the connection string is already set in your .env file as:
+
+MONGO_URI=mongodb+srv://<your_user>:<your_password>@<your_cluster>.mongodb.net/education
+
+Replace the <your_user>, <your_password>, and <your_cluster> with your actual Atlas credentials.
+
+✅ When the app starts, it automatically connects to your Atlas cluster.
+
+3️⃣ Run the server
 
 For development
 
 npm run dev
 
-
 For production
 
 npm run start
 
-3️⃣ Reset / Update Super Admin password
+The API will run at:
+👉 http://localhost:3000
 
-If you need to reset or update the Super Admin password, use:
+4️⃣ Reset / Update Super Admin password
+
+If you ever need to reset or update the Super Admin password:
 
 npm run reset-admin
 
-🔑 Default Login Credentials (from seed.js)
-Admins (all):    password = Admin@123
-Staff  (all):    password = Staff@123
-Students (all):  password = Student@123
+🔑 Default Login Credentials (from data_seed.js)
+Admins (all): password = Admin@123
+Staff (all): password = Staff@123
+Students (all): password = Student@123
 
-For Security 
+🛡️ Security – Rate Limiting
 
-Implemented Rate Limiting so if you enter wrong password more than five(5) times, you IP will block.
-Then, you can try to login only after 15 minutes
+A rate limiter is applied to the login route for security.
+
+If the same IP fails to log in more than 5 times within 15 minutes,
+it will be temporarily blocked.
+You can try again after 15 minutes.
 
 🗂️ Notes & Access Rules
-
-Admin can:
+👑 Admin can:
 
 Create staff & students
 
-View, update, delete any user
+View, update, and delete any user
 
 View and manage all schedules
 
-
-Staff can:
+👨‍🏫 Staff can:
 
 Create, update, and delete only their own schedules
 
 View all schedules
 
+👩‍🎓 Students can:
 
-Students can:
+View only schedules related to them, based on:
 
-View only schedules related to them,
-based on their yearNo, semesterNo, batch or if they are in attendees[].
+yearNo
+
+semesterNo
+
+batch
+
+or if they appear in attendees[]
 
 🧹 Deleting Data
 
 Delete User:
-Use the user’s _id (MongoDB ObjectId)
+Use the user’s \_id (MongoDB ObjectId)
 
 DELETE /api/users/:id
 
-
 Delete Schedule:
-Use the schedule’s _id.
-Only the staff who created it or an admin can delete or modify it.
+Use the schedule’s \_id.
+Only the staff who created the schedule or an admin can delete or modify it.
 
 DELETE /api/schedules/:id
 
 ✅ Health Check
 
-Test server status:
+You can test if the API is up and connected to MongoDB:
 
-GET http://localhost:3000/health
+GET  http://localhost:3000           or 
+GET  http://localhost:3000/health
 
-💡 Tip
+Expected response:
 
-Import the Postman collection included in the repo (postman_collection.json) 
-You can import this file from post man and you can check all these api's
-for ready-to-test APIs: login, create users, manage schedules, etc.
+{
+"status": "ok",
+"message": "Education Scheduler API is running"
+}
 
-That’s it 🎉 — you’re ready to use the Education Scheduler API!
+💡 Postman – How to Import and Test APIs
+
+Open Postman
+
+Click Import → File
+
+Select the provided file:
+📄 postman_collection.json
+
+Click Import
+
+You’ll see a collection named
+“Education Scheduler – Full Flow (Seeded)”
+
+Now you can test:
+
+Admin login, user management
+
+Staff schedule creation and listing
+
+Student schedule viewing
+
+User update/delete
+
+All requests are pre-configured with sample data and tokens.
+
+🧠 Assumptions Made
+
+MongoDB Atlas is used as the default database (no local setup required).
+
+Admins are responsible for creating all Staff and Students.
+
+Students can only view schedules; they cannot modify them.
+
+Each Staff member can modify or delete only schedules they created.
+
+Authentication is JWT-based and required for all routes.
+
+Rate limiting is applied only to login attempts (5 per 15 minutes per IP).
+
+That’s it 🎉
+Your Education Scheduler API is ready to run, connect, and test seamlessly with MongoDB Atlas and Postman!
