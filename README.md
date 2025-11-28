@@ -28,6 +28,11 @@ Admins (all):    password = Admin@123
 Staff  (all):    password = Staff@123
 Students (all):  password = Student@123
 
+For Security 
+
+Implemented Rate Limiting so if you enter wrong password more than five(5) times, you IP will block.
+Then, you can try to login only after 15 minutes
+
 🗂️ Notes & Access Rules
 
 Admin can:
@@ -73,7 +78,8 @@ GET http://localhost:3000/health
 
 💡 Tip
 
-Import the Postman collection included in the repo (postman_collection.json)
+Import the Postman collection included in the repo (postman_collection.json) 
+You can import this file from post man and you can check all these api's
 for ready-to-test APIs: login, create users, manage schedules, etc.
 
 That’s it 🎉 — you’re ready to use the Education Scheduler API!
