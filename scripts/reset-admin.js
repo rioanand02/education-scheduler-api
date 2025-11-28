@@ -11,7 +11,7 @@ const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/education?direct
   try {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
 
-    //Now its just for testing 
+    //Now its just for password testing and reset ( if you create new admin in database then you can change password here!(not for production))
     const email = 'anand@gmail.com';        // change if needed
     const plain = 'Anand@123';              // desired login password
 
