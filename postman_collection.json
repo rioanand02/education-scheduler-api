@@ -21,8 +21,15 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin1@example.com\",\n  \"password\": \"Admin@123\"\n}" }
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin1@example.com\",\n  \"password\": \"Admin@123\"\n}"
+            }
           },
           "event": [
             {
@@ -45,8 +52,15 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"staff1@example.com\",\n  \"password\": \"Staff@123\"\n}" }
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff1@example.com\",\n  \"password\": \"Staff@123\"\n}"
+            }
           },
           "event": [
             {
@@ -69,8 +83,15 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"Student@123\"\n}" }
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"Student@123\"\n}"
+            }
           },
           "event": [
             {
@@ -101,7 +122,11 @@
               { "key": "Authorization", "value": "Bearer {{token_admin}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Staff G\",\n  \"email\": \"staff7@example.com\",\n  \"password\": \"Staff@123\",\n  \"role\": \"staff\"\n}"
@@ -116,7 +141,11 @@
               { "key": "Authorization", "value": "Bearer {{token_admin}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"New Student\",\n  \"email\": \"student11@example.com\",\n  \"password\": \"Student@123\",\n  \"role\": \"student\",\n  \"yearNo\": 1,\n  \"semesterNo\": 1,\n  \"batch\": \"A\"\n}"
@@ -127,8 +156,51 @@
           "name": "List Users (admin)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
-            "url": { "raw": "{{baseUrl}}/users?page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["users"], "query": [ { "key": "page", "value": "1" }, { "key": "limit", "value": "20" } ] }
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User (admin or self)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"yearNo\": 2,\n  \"semesterNo\": 3,\n  \"batch\": \"A\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User (admin only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
           }
         }
       ]
@@ -144,7 +216,11 @@
               { "key": "Authorization", "value": "Bearer {{token_staff}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": { "raw": "{{baseUrl}}/schedules", "host": ["{{baseUrl}}"], "path": ["schedules"] },
+            "url": {
+              "raw": "{{baseUrl}}/schedules",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules"]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Biology – Human Anatomy\",\n  \"description\": \"Basics of the human body\",\n  \"yearNo\": 1,\n  \"semesterNo\": 1,\n  \"batch\": \"A\",\n  \"startAt\": \"2025-12-05T09:00:00.000Z\",\n  \"endAt\": \"2025-12-05T10:00:00.000Z\",\n  \"attendees\": []\n}"
@@ -155,7 +231,9 @@
           "name": "List Schedules (staff/admin)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" }
+            ],
             "url": {
               "raw": "{{baseUrl}}/schedules?yearNo=1&semesterNo=1&batch=A&page=1&limit=20",
               "host": ["{{baseUrl}}"],
@@ -174,16 +252,29 @@
           "name": "Search Schedules (?s=algebra)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
-            "url": { "raw": "{{baseUrl}}/schedules?s=algebra", "host": ["{{baseUrl}}"], "path": ["schedules"], "query": [ { "key": "s", "value": "algebra" } ] }
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules?s=algebra",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules"],
+              "query": [{ "key": "s", "value": "algebra" }]
+            }
           }
         },
         {
           "name": "Get Schedule By ID",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
-            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] }
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules", "{{sampleScheduleId}}"]
+            }
           }
         },
         {
@@ -194,16 +285,29 @@
               { "key": "Authorization", "value": "Bearer {{token_staff}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] },
-            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Updated – Human Anatomy\"\n}" }
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules", "{{sampleScheduleId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated – Human Anatomy\"\n}"
+            }
           }
         },
         {
           "name": "Delete Schedule",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_staff}}" }],
-            "url": { "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}", "host": ["{{baseUrl}}"], "path": ["schedules", "{{sampleScheduleId}}"] }
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_staff}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{sampleScheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules", "{{sampleScheduleId}}"]
+            }
           }
         }
       ]
@@ -215,8 +319,14 @@
           "name": "List My Schedules (student1)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token_student}}" }],
-            "url": { "raw": "{{baseUrl}}/schedules", "host": ["{{baseUrl}}"], "path": ["schedules"] }
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_student}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedules"]
+            }
           }
         }
       ]
