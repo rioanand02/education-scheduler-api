@@ -22,8 +22,7 @@ const { email, password } = req.body;
 console.log(email, password)
 const user = await User.findOne({ email });
 console.log(user)
-if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
-console.log("hekksi")
+if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'User not found');
 const ok = await user.comparePassword(password);
 console.log(ok)
 if (!ok) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
