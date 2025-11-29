@@ -26,7 +26,6 @@ export const create = async (req, res, next) => {
       createdBy: req.user._id
     };
 
-    // quick sanity checks
     if (!payload.title) throw new ApiError(httpStatus.BAD_REQUEST, 'title is required');
     if (!payload.yearNo) throw new ApiError(httpStatus.BAD_REQUEST, 'yearNo is required');
     if (!payload.semesterNo) throw new ApiError(httpStatus.BAD_REQUEST, 'semesterNo is required');
