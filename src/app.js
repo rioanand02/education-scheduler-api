@@ -39,7 +39,7 @@ res.json({ status: 'ok', message: 'Education Scheduler API is running' });
 //   }
 // });
 
-// Main routes prefix
+// Main routes
 app.use('/api', routes);
 
 //app running check

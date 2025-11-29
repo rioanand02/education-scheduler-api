@@ -12,7 +12,6 @@ const MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb://127.0.0.1:27017/education?directConnection=true";
 
-// ----- Minimal Schemas (aligned to app schema) -----
 const userSchema = new mongoose.Schema(
   {
     name: String,
@@ -44,10 +43,8 @@ const scheduleSchema = new mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 const Schedule = mongoose.model("Schedule", scheduleSchema);
 
-// ----- Helpers -----
 const addHours = (d, h) => new Date(d.getTime() + h * 3600000);
 
-// Simple cohort rotation for variety
 const cohorts = [
   { yearNo: 1, semesterNo: 1, batch: "A" },
   { yearNo: 1, semesterNo: 1, batch: "B" },
@@ -63,7 +60,7 @@ async function hash(pw) {
 }
 
 async function createUsers() {
-  // wipe
+
   await User.deleteMany({});
 
   // Admins
@@ -85,7 +82,7 @@ async function createUsers() {
     { name: "Staff F", email: "staff6@example.com", password: staffPw, role: "staff" },
   ]);
 
-  // Students (10) spread across cohorts
+  // Students (10)
   const studentPw = await hash("Student@123");
   const studentsPayload = [];
   const names = [
@@ -111,7 +108,7 @@ async function createUsers() {
 
 function buildSchedules(staffs, students) {
   const now = new Date();
-  // choose some cohorts for the schedules
+ 
   const schedCohorts = [
     { yearNo: 1, semesterNo: 1, batch: "A" },
     { yearNo: 1, semesterNo: 1, batch: "B" },
@@ -129,7 +126,7 @@ function buildSchedules(staffs, students) {
     return filtered.slice(0, limit).map((s) => s._id);
   };
 
-  // 12 schedules at different offsets (some past, some future)
+  // 12 schedules 
   const titles = [
     "Orientation & Welcome",
     "Mathematics – Algebra Basics",
@@ -160,7 +157,7 @@ function buildSchedules(staffs, students) {
     "Arrays, stacks, and queues",
   ];
 
-  // hour offsets to diversify dates (-72h..+240h)
+
   const offsets = [-72, -24, -6, 6, 12, 24, 36, 48, 72, 120, 168, 240];
 
   const payload = [];
@@ -190,7 +187,7 @@ function buildSchedules(staffs, students) {
 async function seed() {
   console.log("Connecting to:", MONGO_URI);
   await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 });
-  console.log("✅ MongoDB connected");
+  console.log("MongoDB connected");
 
   await Schedule.deleteMany({});
   const { admins, staffs, students } = await createUsers();
@@ -198,23 +195,14 @@ async function seed() {
   const schedules = buildSchedules(staffs, students);
   await Schedule.insertMany(schedules);
 
-  console.log("✅ Seeded:");
-  console.log(`  Admins:  ${admins.map((a) => a.email).join(", ")}`);
-  console.log(`  Staff:   ${staffs.map((s) => s.email).join(", ")}`);
-  console.log(`  Students:${students.map((s) => s.email).join(", ")}`);
-  console.log("  Schedules: 12");
-
-  console.log("\n🔑 Credentials:");
-  console.log("  Admins (all):    password = Admin@123");
-  console.log("  Staff  (all):    password = Staff@123");
-  console.log("  Students (all):  password = Student@123");
+  console.log("Seeded:");
 
   await mongoose.disconnect();
-  console.log("✅ Disconnected");
+  console.log("Disconnected==================");
 }
 
 seed().catch((err) => {
-  console.error("❌ Seed failed:", err);
+  console.error("Seed failed:", err);
   mongoose.disconnect();
   process.exit(1);
 });

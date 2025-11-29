@@ -42,7 +42,7 @@ export const getUser = async (req, res, next) => {
   }
 };
 
-// Update user (admin or self). Admin may change role; others cannot.
+// Update user (admin or self). Admin can change role; others cannot
 export const updateUser = async (req, res, next) => {
   try {
     const allowed = ['name', 'password', 'yearNo', 'semesterNo', 'batch'];

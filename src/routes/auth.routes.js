@@ -9,7 +9,6 @@ const router = Router();
 // Public
 router.post('/login',loginLimiter, login);
 
-// Admin-only user creation (staff/students)
 router.post('/register', requireAuth, permit(ROLES.ADMIN), register);
 
 export default router;

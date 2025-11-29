@@ -7,15 +7,15 @@ import app from './app.js';
 try {
 // Connect to MongoDB
 await connectDB();
-console.log('✅ MongoDB Connected');
+console.log('MongoDB Connected');
 
 
 // Start Express server
 app.listen(env.port, () => {
-console.log(`🚀 Server running at http://localhost:${env.port}`);
+console.log(`Server running at http://localhost:${env.port}`);
 });
 } catch (err) {
-console.error('❌ Server startup failed:', err);
+console.error('Server startup failed:', err);
 process.exit(1);
 }
 })();

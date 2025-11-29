@@ -10,7 +10,7 @@ const header = req.headers.authorization || '';
 const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 if (!token) throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
 const payload = verifyToken(token);
-console.log(payload)
+console.log(payload,"===check payload===")
 const user = await User.findById(payload.sub);
 if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
 req.user = user;

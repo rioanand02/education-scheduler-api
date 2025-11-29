@@ -137,7 +137,7 @@ export const patch = async (req, res, next) => {
   }
 };
 
-// Delete schedule (owner staff or admin)
+// Delete schedule
 export const remove = async (req, res, next) => {
   try {
     const existing = await Schedule.findById(req.params.id);
