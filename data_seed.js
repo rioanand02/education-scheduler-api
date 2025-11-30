@@ -1,5 +1,5 @@
-// seed.js
-// Run: node seed.js
+// Its only for static data 
+// Run: node data_seed.js
 // Creates 3 admins, 6 staff, 10 students, and 12 schedules that match your API schema.
 
 import mongoose from "mongoose";
